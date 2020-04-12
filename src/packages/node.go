@@ -1,7 +1,6 @@
 package packages
 
 import (
-	"bytes"
 	"fmt"
 	"go/ast"
 	"go/format"
@@ -40,7 +39,8 @@ func (n Node) String() string {
 		return ""
 	}
 
-	buf := bytes.NewBuffer(nil)
+	buf := bufPool.Get()
+	defer bufPool.Put(buf)
 
 	if err := n.format(buf); err != nil {
 		panic(fmt.Errorf("could not format %#v: %w", n.Node, err))
