@@ -35,7 +35,7 @@ func (n Node) format(dst io.Writer) error {
 }
 
 func (n Node) String() string {
-	if !n.safeForFormatting() {
+	if !n.isSafeForFormatting() {
 		return ""
 	}
 
@@ -48,7 +48,7 @@ func (n Node) String() string {
 	return buf.String()
 }
 
-func (n Node) safeForFormatting() bool {
+func (n Node) isSafeForFormatting() bool {
 	switch n.Node.(type) {
 	case ast.Expr, ast.Stmt, ast.Decl, ast.Spec, *ast.File:
 		return true

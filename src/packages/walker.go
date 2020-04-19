@@ -48,7 +48,7 @@ func (w walker) pkgWalk(pkg *packages.Package) bool {
 func (w walker) astWalk(node ast.Node) bool {
 	msg := w.newMessage(node)
 
-	if node == nil || !msg.safeForFormatting() {
+	if node == nil || !msg.isSafeForFormatting() {
 		return true
 	}
 
