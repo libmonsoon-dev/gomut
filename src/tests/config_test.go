@@ -24,7 +24,7 @@ func TestGetCommand(t *testing.T) {
 	deadlineCtx, cancel3 := context.WithDeadline(context.Background(), time.Now().Add(time.Second))
 	defer cancel3()
 
-	tests := []config{
+	tests := []Config{
 		{
 			Path: "fmt",
 		},
@@ -82,7 +82,7 @@ func TestGetCommand(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		t.Run(fmt.Sprintf("#%v", i+1), func(t *testing.T) {
+		t.Run(fmt.Sprintf("test#%v", i+1), func(t *testing.T) {
 			expectedCtx := test.Ctx
 			cmd := test.GetCommand()
 

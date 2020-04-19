@@ -5,10 +5,15 @@ import (
 	"os/exec"
 )
 
-const testCommand = "test"
-const jsonFlag = "-json"
+const (
+	testCommand = "test"
+	jsonFlag    = "-json"
+)
 
-type config struct {
+// Config is a structure with which you can configure a test command.
+// All fields can safely have zero value.
+// For more info see "go help test".
+type Config struct {
 	Ctx             context.Context
 	GoBin           string
 	BuildTestFlags  []string
@@ -16,15 +21,18 @@ type config struct {
 	TestBinaryFlags []string
 }
 
-func (c config) GetCommand() *exec.Cmd {
-	goBin := c.GoBin
-	if goBin == "" {
-		goBin = "go"
+// GetCommand returns not started test *exec.Cmd
+func (c Config) GetCommand() *exec.Cmd {
+	if c.Ctx == nil {
+		c.Ctx = context.Background()
 	}
 
-	ctx := c.Ctx
-	if ctx == nil {
-		ctx = context.Background()
+	if c.GoBin == "" {
+		c.GoBin = "go"
+	}
+
+	if c.Path == "" {
+		c.Path = "./..."
 	}
 
 	args := []string{testCommand, jsonFlag}
@@ -33,5 +41,5 @@ func (c config) GetCommand() *exec.Cmd {
 	args = append(args, c.Path)
 	args = append(args, c.TestBinaryFlags...)
 
-	return exec.CommandContext(ctx, goBin, args...)
+	return exec.CommandContext(c.Ctx, c.GoBin, args...)
 }
