@@ -11,10 +11,14 @@ build:
 goreport:
 	goreportcard-cli -v -t 100.0
 
+# TODO: run this in Docker
+ruleguard:
+	ruleguard -c=3 -rules=rules.go -fix ./...
+
 test:
 	go test -v ./src/...
 
 clean:
 	rm -rf build
 
-pre-commit: generate build goreport test
+pre-commit: generate build ruleguard goreport test
