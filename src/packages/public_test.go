@@ -80,7 +80,7 @@ func TestLoad(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		t.Run(fmt.Sprintf("test#%v", i), func(t *testing.T) {
+		t.Run(fmt.Sprintf("test#%v", i+1), func(t *testing.T) {
 			got, err := Load(test.args...)
 			if err != test.expectedError {
 				t.Errorf("Load() error: %v, expectedError: %v", err, test.expectedError)
@@ -361,7 +361,7 @@ func TestWalk(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		t.Run(fmt.Sprintf("test#%v", i), func(t *testing.T) {
+		t.Run(fmt.Sprintf("test#%v", i+1), func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 150*time.Millisecond)
 			defer cancel()
 
