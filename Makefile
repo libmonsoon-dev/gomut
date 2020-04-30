@@ -5,6 +5,9 @@ all: clean generate build
 generate:
 	go generate ./src/...
 
+fmt-staged:
+	./fmt-staged.sh
+
 build:
 	mkdir -p build && cd build && go build ../src/...
 
@@ -21,4 +24,4 @@ test:
 clean:
 	rm -rf build
 
-pre-commit: generate build ruleguard goreport test
+pre-commit: generate fmt-staged build ruleguard goreport test
