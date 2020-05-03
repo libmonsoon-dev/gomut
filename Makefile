@@ -25,3 +25,15 @@ clean:
 	rm -rf build
 
 pre-commit: generate fmt-staged build ruleguard goreport test
+
+coverage.out:
+	go test ./src/... -coverprofile=coverage.out
+
+coverage.html: coverage.out
+	go tool cover -html=coverage.out -o coverage.html
+
+clear-coverage:
+	rm coverage.html coverage.out
+
+coverage: clear-coverage coverage.html
+	open coverage.html
