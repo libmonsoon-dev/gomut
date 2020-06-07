@@ -6,9 +6,9 @@ import (
 )
 
 type Message struct {
-	PkgName  string
-	FileName string
-	Code     string
+	PkgName         string
+	ProjectFilePath string
+	Code            string
 }
 
 func (m Message) AssertMatch(node Node) error {
@@ -16,8 +16,8 @@ func (m Message) AssertMatch(node Node) error {
 		return fmt.Errorf("packages not equal:\ngot:      %#v\nexpected: %#v", pkgName, m.PkgName)
 	}
 
-	if !strings.HasSuffix(node.FileName, m.FileName) {
-		return fmt.Errorf("FileName not match:\ngot:      %#v\nexpected: %#v", node.FileName, m.FileName)
+	if !strings.HasSuffix(node.ProjectFilePath, m.ProjectFilePath) {
+		return fmt.Errorf("ProjectFilePath not match:\ngot:      %#v\nexpected: %#v", node.ProjectFilePath, m.ProjectFilePath)
 	}
 
 	if actualCode := node.String(); actualCode != m.Code {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/format"
+	"go/token"
 	"golang.org/x/tools/go/packages"
 	"io"
 )
@@ -14,9 +15,10 @@ var errNodeIsNil = fmt.Errorf("node.Node is nil")
 
 // Node is the structure that Walk generates. Is ast.Node with context.
 type Node struct {
-	Package  *packages.Package
-	File     *ast.File
-	FileName string
+	Package          *packages.Package
+	File             *ast.File
+	ProjectFilePath  string
+	AbsoluteFilePath string
 	ast.Node
 }
 
@@ -46,6 +48,12 @@ func (n Node) String() string {
 		panic(fmt.Errorf("could not format %#v: %w", n.Node, err))
 	}
 	return buf.String()
+}
+
+// Position return start and end token.Position of underlying ast.Node
+func (n Node) Position() (start, end token.Position) {
+	fset := n.Package.Fset
+	return fset.Position(n.Pos()), fset.Position(n.End())
 }
 
 func (n Node) isSafeForFormatting() bool {

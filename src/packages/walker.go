@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"go/ast"
 	"golang.org/x/tools/go/packages"
+	"os"
+	"path"
 )
 
 type walker struct {
-	ctx             context.Context
-	out             chan Node
-	currentPkg      *packages.Package
-	currentFile     *ast.File
-	currentFileName string
+	ctx              context.Context
+	out              chan Node
+	currentPkg       *packages.Package
+	currentFile      *ast.File
+	projectFilePath  string
+	absoluteFilePath string
 }
 
 func newWalker(ctx context.Context) *walker {
@@ -27,12 +30,14 @@ func (w walker) pkgWalk(pkg *packages.Package) bool {
 	}
 
 	for i := range pkg.Syntax {
-		file := pkg.Syntax[i]
-		fileName := pkg.CompiledGoFiles[i]
+		astFile := pkg.Syntax[i]
+		projectFilePath := fmt.Sprintf("%s%c%s", pkg.ID, os.PathSeparator, path.Base(pkg.CompiledGoFiles[i]))
 
-		w.setCurrentFile(file)
-		w.setCurrentFileName(fileName)
-		ast.Inspect(file, w.astWalk)
+		w.setCurrentFile(astFile)
+		w.setCurrentProjectFilePath(projectFilePath)
+		w.setCurrentAbsoluteFilePath(pkg.CompiledGoFiles[i])
+
+		ast.Inspect(astFile, w.astWalk)
 
 		select {
 		case <-w.ctx.Done():
@@ -61,7 +66,7 @@ func (w walker) astWalk(node ast.Node) bool {
 }
 
 func (w *walker) newMessage(node ast.Node) Node {
-	return Node{w.currentPkg, w.currentFile, w.currentFileName, node}
+	return Node{w.currentPkg, w.currentFile, w.projectFilePath, w.absoluteFilePath, node}
 }
 
 func (w *walker) setCurrentPkg(pkg *packages.Package) {
@@ -72,6 +77,10 @@ func (w *walker) setCurrentFile(file *ast.File) {
 	w.currentFile = file
 }
 
-func (w *walker) setCurrentFileName(fileName string) {
-	w.currentFileName = fileName
+func (w *walker) setCurrentProjectFilePath(projectFilePath string) {
+	w.projectFilePath = projectFilePath
+}
+
+func (w walker) setCurrentAbsoluteFilePath(absoluteFilePath string) {
+	w.absoluteFilePath = absoluteFilePath
 }

@@ -21,10 +21,10 @@ func BenchmarkNode_String(b *testing.B) {
 			pkg := mustLoad(bench.pkgPattern)[0]
 			file := pkg.Syntax[bench.fileIndex]
 			node := Node{
-				Package:  pkg,
-				File:     file,
-				FileName: pkg.CompiledGoFiles[bench.fileIndex],
-				Node:     file,
+				Package:         pkg,
+				File:            file,
+				ProjectFilePath: pkg.CompiledGoFiles[bench.fileIndex],
+				Node:            file,
 			}
 
 			b.ReportAllocs()

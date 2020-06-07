@@ -3,16 +3,11 @@ package test
 import (
 	"context"
 	"fmt"
+	"github.com/libmonsoon-dev/gomut/src/testutil"
 	"github.com/libmonsoon-dev/jsontest"
 	"golang.org/x/tools/cover"
 	"reflect"
 	"testing"
-)
-
-const (
-	arithmeticV1 = "github.com/libmonsoon-dev/gomut/testdata/arithmetic/v1"
-	arithmeticV2 = "github.com/libmonsoon-dev/gomut/testdata/arithmetic/v2"
-	arithmeticV3 = "github.com/libmonsoon-dev/gomut/testdata/arithmetic/v3"
 )
 
 func TestGetCoverage(t *testing.T) {
@@ -22,7 +17,7 @@ func TestGetCoverage(t *testing.T) {
 	}
 	tests := []struct {
 		args    Args
-		want    []*cover.Profile
+		want    Profiles
 		wantErr bool
 	}{
 		{
@@ -30,39 +25,43 @@ func TestGetCoverage(t *testing.T) {
 				nil,
 				arithmeticV1,
 			},
-			want: []*cover.Profile{
+			want: NewProfiles([]*cover.Profile{
 				{
 					FileName: "github.com/libmonsoon-dev/gomut/testdata/arithmetic/v1/sum.go",
 					Mode:     "set",
 					Blocks:   []cover.ProfileBlock{{StartLine: 3, StartCol: 24, EndLine: 5, EndCol: 2, NumStmt: 1, Count: 1}},
 				},
-			},
+			}),
 		},
 		{
 			args: Args{
 				nil,
 				arithmeticV2,
 			},
-			want: []*cover.Profile{{
+			want: NewProfiles([]*cover.Profile{{
 				FileName: "github.com/libmonsoon-dev/gomut/testdata/arithmetic/v2/sum.go",
 				Mode:     "set",
 				Blocks:   []cover.ProfileBlock{{StartLine: 3, StartCol: 24, EndLine: 5, EndCol: 2, NumStmt: 1, Count: 1}},
-			}},
+			}}),
 		},
 		{
 			args: Args{
 				nil,
 				arithmeticV3,
 			},
-			want: []*cover.Profile{{
+			want: NewProfiles([]*cover.Profile{{
 				FileName: "github.com/libmonsoon-dev/gomut/testdata/arithmetic/v3/sum.go",
 				Mode:     "set",
 				Blocks:   []cover.ProfileBlock{{StartLine: 3, StartCol: 24, EndLine: 5, EndCol: 2, NumStmt: 1, Count: 1}},
-			}},
+			}}),
 		},
 	}
 	for i, test := range tests {
+		test := test
+
 		t.Run(fmt.Sprintf("test#%v", i+1), func(t *testing.T) {
+			t.Parallel()
+
 			got, err := GetCoverage(test.args.ctx, test.args.path)
 			if (err != nil) != test.wantErr {
 				t.Errorf("GetCoverage() error = %v, wantErr %v", err, test.wantErr)
@@ -72,8 +71,8 @@ func TestGetCoverage(t *testing.T) {
 				t.Errorf("Coverage profiles length not equal: got: %v want: %v", len(got), len(test.want))
 			}
 			for i := 0; i < len(got); i++ {
-				if !reflect.DeepEqual(got[i], test.want[i]) {
-					t.Errorf("GetCoverage(): \ngot = %#v\nwant %#v", got[i], test.want[i])
+				if !reflect.DeepEqual(got, test.want) {
+					t.Errorf("GetCoverage(): \ngot = %#v\nwant %#v", got, test.want)
 				}
 			}
 		})
@@ -251,22 +250,30 @@ func TestRunTest(t *testing.T) {
 			arg: Config{
 				Path: "./notExist",
 			},
-			want: []Event{
-				{
-					Err: fmt.Errorf("test command error: exit status 1: build ./notExist: cannot find module for path ./notExist"),
-				},
-			},
+			want: []Event{{
+				Err: fmt.Errorf(
+					"test command error: %s: %s",
+					"exit status 1: can't load package",
+					fmt.Sprintf("package ./notExist: cannot find package \".\" in:\n"+
+						"	%v/src/test/notExist",
+						testutil.ProjectPath(),
+					),
+				),
+			}},
 		},
 	}
 
 	for i, test := range tests {
+		test := test
+
 		t.Run(fmt.Sprintf("test#%v", i+1), func(t *testing.T) {
+			t.Parallel()
+
 			var i int
 			for msg := range Run(test.arg) {
 				if msg.Err != nil && test.want[i].Err != nil {
-
 					if msg.Err.Error() != test.want[i].Err.Error() {
-						t.Errorf("Run() error = %v, wantErr %v", msg.Err, test.want[i].Err)
+						t.Errorf("Run() error:\n%v\nwantErr:\n%v", msg.Err, test.want[i].Err)
 					}
 
 				} else if msg.Err != nil {

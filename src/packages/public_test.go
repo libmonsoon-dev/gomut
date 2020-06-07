@@ -3,6 +3,7 @@ package packages
 import (
 	"context"
 	"fmt"
+	"github.com/libmonsoon-dev/gomut/src/testutil"
 	"go/ast"
 	"go/token"
 	"golang.org/x/tools/go/packages"
@@ -31,7 +32,11 @@ func TestLoad(t *testing.T) {
 		{
 			[]string{"./notExist"},
 			nil,
-			ErrMatchedNoPackages,
+			fmt.Errorf(
+				"package _%v/src/packages/notExist: -: cannot find package \".\" in:\n"+
+					"\t%[1]v/src/packages/notExist",
+				testutil.ProjectPath(),
+			),
 		},
 		{
 			[]string{"../../testdata/arithmetic/v1"},
@@ -80,10 +85,14 @@ func TestLoad(t *testing.T) {
 	}
 
 	for i, test := range tests {
+		test := test
+
 		t.Run(fmt.Sprintf("test#%v", i+1), func(t *testing.T) {
+			t.Parallel()
+
 			got, err := Load(test.args...)
-			if err != test.expectedError {
-				t.Errorf("Load() error: %v, expectedError: %v", err, test.expectedError)
+			if err != test.expectedError && err.Error() != test.expectedError.Error() {
+				t.Errorf("Load():\n%v\nexpectedError:\n%v", err, test.expectedError)
 				return
 			}
 			if len(got) != len(test.expectedIds) {
@@ -96,6 +105,7 @@ func TestLoad(t *testing.T) {
 			}
 		})
 	}
+
 }
 
 func TestWalk(t *testing.T) {
@@ -361,7 +371,11 @@ func TestWalk(t *testing.T) {
 	}
 
 	for i, test := range tests {
+		test := test
+
 		t.Run(fmt.Sprintf("test#%v", i+1), func(t *testing.T) {
+			t.Parallel()
+
 			ctx, cancel := context.WithTimeout(context.Background(), 150*time.Millisecond)
 			defer cancel()
 

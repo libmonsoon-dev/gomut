@@ -10,7 +10,7 @@ import (
 
 // GetCoverage exec go test with -coverprofile flag.
 // After successful exit of test command parse end return coverage profile
-func GetCoverage(ctx context.Context, path string) ([]*cover.Profile, error) {
+func GetCoverage(ctx context.Context, path string) (Profiles, error) {
 	coveragePath := fmt.Sprintf("%v/%v.coverage", os.TempDir(), rand.String(10))
 	coverProfileFlag := fmt.Sprintf("-coverprofile=%s", coveragePath)
 
@@ -26,7 +26,11 @@ func GetCoverage(ctx context.Context, path string) ([]*cover.Profile, error) {
 		}
 	}
 
-	return cover.ParseProfiles(coveragePath)
+	profiles, err := cover.ParseProfiles(coveragePath)
+	if err != nil {
+		return nil, fmt.Errorf("cover.ParseProfiles(%v): %w", coveragePath, err)
+	}
+	return NewProfiles(profiles), nil
 }
 
 // Run exec go test command
