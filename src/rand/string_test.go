@@ -15,7 +15,11 @@ func TestString(t *testing.T) {
 		{10},
 	}
 	for i, test := range tests {
+		test := test
+
 		t.Run(fmt.Sprintf("test#%v", i+1), func(t *testing.T) {
+			t.Parallel()
+
 			if got := String(test.Length); len(got) != test.Length {
 				t.Errorf("String() = %v (len = %v), expect: len %v", got, len(got), test.Length)
 			}

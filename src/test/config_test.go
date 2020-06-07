@@ -82,7 +82,11 @@ func TestGetCommand(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
+		test := test
+
 		t.Run(fmt.Sprintf("test#%v", i+1), func(t *testing.T) {
+			t.Parallel()
+
 			expectedCtx := test.Ctx
 			cmd := test.GetCommand()
 
