@@ -2,6 +2,7 @@ package packages
 
 import (
 	"bytes"
+	"os"
 	"sync"
 )
 
@@ -18,10 +19,12 @@ func (b *bufferPool) Put(buf *bytes.Buffer) {
 	b.pool.Put(buf)
 }
 
+var memoryPageSize = os.Getpagesize()
+
 var bufPool = &bufferPool{
 	sync.Pool{
 		New: func() interface{} {
-			return bytes.NewBuffer(make([]byte, 0, 2048))
+			return bytes.NewBuffer(make([]byte, 0, memoryPageSize))
 		},
 	},
 }
