@@ -22,15 +22,15 @@ goreport:
 
 # TODO: run this in Docker
 ruleguard:
-	ruleguard -c=3 -rules=rules.go -fix ./...
+	ruleguard -c=3 -rules=tools/ruleguard/rules.go -fix ./...
 
 test:
-	go test -v ./src/...
+	go test ./src/...
 
 clean:
 	rm -rf build
 
-pre-commit: generate fmt-staged build ruleguard goreport test
+pre-commit: generate mod-tidy fmt-staged build ruleguard goreport test
 
 coverage.out: build-dir
 	go test ./src/... -coverprofile=build/coverage.out
@@ -40,3 +40,6 @@ coverage.html: coverage.out
 
 coverage: coverage.html
 	open build/coverage.html
+
+mod-tidy:
+	go mod tidy -v
