@@ -1,7 +1,5 @@
 .idea
 
-cover.out
 build
 
-coverage.out
-coverage.html
+src/cmd/playground
