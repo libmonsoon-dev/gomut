@@ -85,7 +85,7 @@ func TestRunTest(t *testing.T) {
 		want []Event
 	}{
 		{
-			arg: Config{Path: arithmeticV1},
+			arg: Config{Paths: []string{arithmeticV1}},
 			want: []Event{
 				{
 					Event: jsontest.Event{
@@ -139,7 +139,7 @@ func TestRunTest(t *testing.T) {
 			},
 		},
 		{
-			arg: Config{Path: arithmeticV2},
+			arg: Config{Paths: []string{arithmeticV2}},
 			want: []Event{
 				{
 					Event: jsontest.Event{
@@ -193,7 +193,7 @@ func TestRunTest(t *testing.T) {
 			},
 		},
 		{
-			arg: Config{Path: arithmeticV3},
+			arg: Config{Paths: []string{arithmeticV3}},
 			want: []Event{
 				{
 					Event: jsontest.Event{
@@ -248,7 +248,7 @@ func TestRunTest(t *testing.T) {
 		},
 		{
 			arg: Config{
-				Path: "./notExist",
+				Paths: []string{"./notExist"},
 			},
 			want: []Event{{
 				Err: fmt.Errorf(

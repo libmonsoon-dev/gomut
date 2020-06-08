@@ -17,7 +17,7 @@ type Config struct {
 	Ctx             context.Context
 	GoBin           string
 	BuildTestFlags  []string
-	Path            string
+	Paths           []string
 	TestBinaryFlags []string
 }
 
@@ -31,14 +31,14 @@ func (c Config) GetCommand() *exec.Cmd {
 		c.GoBin = "go"
 	}
 
-	if c.Path == "" {
-		c.Path = "./..."
+	if len(c.Paths) == 0 {
+		c.Paths = []string{"./..."}
 	}
 
 	args := []string{testCommand, jsonFlag}
 
 	args = append(args, c.BuildTestFlags...)
-	args = append(args, c.Path)
+	args = append(args, c.Paths...)
 	args = append(args, c.TestBinaryFlags...)
 
 	return exec.CommandContext(c.Ctx, c.GoBin, args...)

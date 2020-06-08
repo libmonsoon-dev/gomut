@@ -26,55 +26,55 @@ func TestGetCommand(t *testing.T) {
 
 	tests := []Config{
 		{
-			Path: "fmt",
+			Paths: []string{"fmt"},
 		},
 		{
-			Path:           "fmt",
+			Paths:          []string{"fmt"},
 			BuildTestFlags: []string{"-coverprofile=cover.out"},
 		},
 		{
-			Path:            "fmt",
+			Paths:           []string{"fmt"},
 			TestBinaryFlags: []string{"-test.short"},
 		},
 		{
-			Path:            "fmt",
+			Paths:           []string{"fmt"},
 			BuildTestFlags:  []string{"-coverprofile=cover.out"},
 			TestBinaryFlags: []string{"-test.short"},
 		},
 		{
-			Path:  "fmt",
+			Paths: []string{"fmt"},
 			GoBin: "go1.14.1",
 		},
 		{
-			Path:  "fmt",
+			Paths: []string{"fmt"},
 			GoBin: "go",
 		},
 		{
-			Path: "fmt",
-			Ctx:  context.Background(),
+			Paths: []string{"fmt"},
+			Ctx:   context.Background(),
 		},
 		{
-			Path: "fmt",
-			Ctx:  context.TODO(),
+			Paths: []string{"fmt"},
+			Ctx:   context.TODO(),
 		},
 		{
-			Path: "fmt",
-			Ctx:  context.WithValue(context.Background(), KeyA, "value"),
+			Paths: []string{"fmt"},
+			Ctx:   context.WithValue(context.Background(), KeyA, "value"),
 		},
 		{
-			Path: "fmt",
-			Ctx:  timeoutCtx,
+			Paths: []string{"fmt"},
+			Ctx:   timeoutCtx,
 		},
 		{
-			Path: "fmt",
-			Ctx:  cancelCtx,
+			Paths: []string{"fmt"},
+			Ctx:   cancelCtx,
 		},
 		{
-			Path: "fmt",
-			Ctx:  deadlineCtx,
+			Paths: []string{"fmt"},
+			Ctx:   deadlineCtx,
 		},
 		{
-			Path:            "fmt",
+			Paths:           []string{"fmt"},
 			GoBin:           "go1.14.1",
 			BuildTestFlags:  []string{"-coverprofile=cover.out"},
 			TestBinaryFlags: []string{"-test.short"},
@@ -142,13 +142,15 @@ func TestGetCommand(t *testing.T) {
 				return
 			}
 
-			cmdPathIndex := buildTestFlagsEnd
-			if cmdPath := cmd.Args[cmdPathIndex]; cmdPath != test.Path {
-				t.Errorf("cmdPath != test.Path (%#v != %#v)", cmdPath, test.Path)
+			cmdPathStart := buildTestFlagsEnd
+			cmdPathEnd := len(test.Paths) + cmdPathStart
+
+			if cmdPath := cmd.Args[cmdPathStart:cmdPathEnd]; !stringsEqual(cmdPath, test.Paths) {
+				t.Errorf("cmdPath != test.Path (%#v != %#v)", cmdPath, test.Paths)
 				return
 			}
 
-			cmdTestBinaryFlagsStart := cmdPathIndex + 1
+			cmdTestBinaryFlagsStart := cmdPathStart + 1
 			cmdTestBinaryFlags := cmd.Args[cmdTestBinaryFlagsStart:]
 			if !stringsEqual(cmdTestBinaryFlags, test.TestBinaryFlags) {
 				t.Errorf(
