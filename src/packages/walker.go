@@ -81,6 +81,6 @@ func (w *walker) setCurrentProjectFilePath(projectFilePath string) {
 	w.projectFilePath = projectFilePath
 }
 
-func (w walker) setCurrentAbsoluteFilePath(absoluteFilePath string) {
+func (w *walker) setCurrentAbsoluteFilePath(absoluteFilePath string) {
 	w.absoluteFilePath = absoluteFilePath
 }
