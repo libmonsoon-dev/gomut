@@ -252,12 +252,8 @@ func TestRunTest(t *testing.T) {
 			},
 			want: []Event{{
 				Err: fmt.Errorf(
-					"test command error: %s: %s",
-					"exit status 1: can't load package",
-					fmt.Sprintf("package ./notExist: cannot find package \".\" in:\n"+
-						"	%v/src/test/notExist",
-						testutil.ProjectPath(),
-					),
+					"test command error: exit status 1: stat %v/src/test/notExist: directory not found",
+					testutil.ProjectPath(),
 				),
 			}},
 		},
@@ -273,11 +269,11 @@ func TestRunTest(t *testing.T) {
 			for msg := range Run(test.arg) {
 				if msg.Err != nil && test.want[i].Err != nil {
 					if msg.Err.Error() != test.want[i].Err.Error() {
-						t.Errorf("Run() error:\n%v\nwantErr:\n%v", msg.Err, test.want[i].Err)
+						t.Errorf("Run(): %v\nwantErr: %v", msg.Err, test.want[i].Err)
 					}
 
 				} else if msg.Err != nil {
-					t.Error(msg.Err)
+					t.Errorf("Unexpected error in event #%v: %v", i, msg.Err)
 				} else if !eventEqual(msg.Event, test.want[i].Event) {
 					t.Errorf("Message #%v\nevent = %#v, \nexpect = %#v", i+1, msg.Event, test.want[i])
 				}

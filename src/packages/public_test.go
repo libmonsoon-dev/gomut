@@ -33,8 +33,7 @@ func TestLoad(t *testing.T) {
 			[]string{"./notExist"},
 			nil,
 			fmt.Errorf(
-				"package _%v/src/packages/notExist: -: cannot find package \".\" in:\n"+
-					"\t%[1]v/src/packages/notExist",
+				"package ./notExist: -: stat %v/src/packages/notExist: directory not found",
 				testutil.ProjectPath(),
 			),
 		},
@@ -92,7 +91,7 @@ func TestLoad(t *testing.T) {
 
 			got, err := Load(test.args...)
 			if err != test.expectedError && err.Error() != test.expectedError.Error() {
-				t.Errorf("Load():\n%v\nexpectedError:\n%v", err, test.expectedError)
+				t.Errorf("Load(): %v\nExpected error: %v", err, test.expectedError)
 				return
 			}
 			if len(got) != len(test.expectedIds) {
