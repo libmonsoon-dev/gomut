@@ -3,6 +3,7 @@ package packages
 import (
 	"context"
 	"fmt"
+	"github.com/go-toolsmith/pkgload"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -49,7 +50,7 @@ func Load(paths ...string) ([]*packages.Package, error) {
 		return nil, ErrMatchedNoPackages
 	}
 
-	return pkgs, nil
+	return pkgload.Deduplicate(pkgs), nil
 }
 
 // Walk is a Node generator that bypasses the packages specified in the arguments.
