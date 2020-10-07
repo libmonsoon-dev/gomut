@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-toolsmith/pkgload"
 	"golang.org/x/tools/go/packages"
+	"sort"
 )
 
 // ErrMatchedNoPackages - the error that Load returns in case the underlying loader does not return an error,
@@ -50,7 +51,13 @@ func Load(paths ...string) ([]*packages.Package, error) {
 		return nil, ErrMatchedNoPackages
 	}
 
-	return pkgload.Deduplicate(pkgs), nil
+	pkgs = pkgload.Deduplicate(pkgs)
+
+	sort.Slice(pkgs, func(i, j int) bool {
+		return pkgs[i].ID < pkgs[j].ID
+	})
+
+	return pkgs, nil
 }
 
 // Walk is a Node generator that bypasses the packages specified in the arguments.
