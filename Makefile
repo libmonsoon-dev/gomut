@@ -11,7 +11,10 @@ generate:
 build-dir:
 	mkdir -p build
 
-typecheck: build-dir
+build: build-dir
+	cd build && go build ../src/cmd/gomut
+
+typecheck:
 	go build ./src/...
 
 goreport:
