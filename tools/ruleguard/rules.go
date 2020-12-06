@@ -4,7 +4,6 @@ package gorules
 
 import (
 	"github.com/quasilyte/go-ruleguard/dsl/fluent"
-	// _ "github.com/quasilyte/go-ruleguard/cmd/ruleguard"
 )
 
 func _(m fluent.Matcher) {

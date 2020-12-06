@@ -8,19 +8,15 @@ all: clean generate build
 generate:
 	go generate ./src/...
 
-fmt-staged:
-	./fmt-staged.sh
-
 build-dir:
 	mkdir -p build
 
-build: build-dir
-	cd build && go build ../src/...
+typecheck: build-dir
+	go build ./src/...
 
 goreport:
 	goreportcard-cli -v -t 100.0
 
-# TODO: run this in Docker
 ruleguard:
 	ruleguard -c=3 -rules=tools/ruleguard/rules.go -fix ./...
 
@@ -30,7 +26,7 @@ test:
 clean:
 	rm -rf build
 
-pre-commit: generate mod-tidy fmt-staged build ruleguard goreport test
+pre-commit: generate mod-tidy typecheck ruleguard goreport test
 
 coverage.out: build-dir
 	go test ./src/... -coverprofile=build/coverage.out
@@ -43,3 +39,6 @@ coverage: coverage.html
 
 mod-tidy:
 	go mod tidy -v
+
+install-tools:
+	go list -f '{{range .Imports}}{{.}} {{end}}' tools/tools.go | xargs go get -v
